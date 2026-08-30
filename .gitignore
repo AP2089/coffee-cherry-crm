@@ -1,0 +1,12 @@
+.env
+node_modules
+.nuxt
+.output
+dist
+*.log
+.DS_Store
+.idea
+.vscode
+coverage
+*.local
+.eslintcache

@@ -1,0 +1,102 @@
+@use 'variables' as *;
+
+.magnetic-btn {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  isolation: isolate;
+  overflow: hidden;
+  cursor: pointer;
+  border: 1px solid rgba($bone, 0.22);
+  background: transparent;
+  color: $bone;
+  font-family: 'Syne', sans-serif;
+  font-size: 11px;
+  line-height: 1.25;
+  font-weight: 400;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  transition:
+    border-color 0.4s $ease-premium,
+    color 0.4s $ease-premium,
+    transform 0.45s $ease-premium,
+    background 0.4s $ease-premium;
+
+  &::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: $bone;
+    transform: translateY(101%);
+    transition: transform 0.5s $ease-premium;
+    z-index: -1;
+  }
+
+  &:hover,
+  &:focus-visible {
+    color: $ink;
+    border-color: $bone;
+    outline: none;
+
+    &::before {
+      transform: translateY(0);
+    }
+  }
+
+  &:active {
+    transform: scale(0.98);
+  }
+
+  &--filled {
+    background: $bone;
+    color: $ink;
+    border-color: $bone;
+
+    &::before {
+      background: $bronze;
+    }
+
+    &:hover,
+    &:focus-visible {
+      color: $bone;
+    }
+  }
+
+  &:disabled {
+    opacity: 0.45;
+    cursor: not-allowed;
+    pointer-events: none;
+  }
+}
+
+@keyframes alert-dialog-fade-in {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes alert-dialog-fade-out {
+  from {
+    opacity: 1;
+  }
+
+  to {
+    opacity: 0;
+  }
+}
+
+.alert-dialog-overlay,
+.alert-dialog-content {
+  &[data-state='open'] {
+    animation: alert-dialog-fade-in 300ms $ease-premium forwards;
+  }
+
+  &[data-state='closed'] {
+    animation: alert-dialog-fade-out 300ms $ease-premium forwards;
+  }
+}
