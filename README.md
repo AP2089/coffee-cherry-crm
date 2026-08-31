@@ -18,21 +18,30 @@ npm run dev
 
 Приложение: http://localhost:3003
 
+### Docker
+
+Сначала запустите backend, затем:
+
+```bash
+docker compose up -d --build
+```
+
 ## Переменные окружения
 
 Файл `.env` в корне проекта.
 
-| Переменная | Описание |
-| ---------- | -------- |
-| `NUXT_PUBLIC_API_URL` | URL REST API для браузера (CRUD товаров, заказов, контактов) |
-| `NUXT_API_URL` | URL API для SSR-запросов на сервере Nuxt |
-| `NUXT_PUBLIC_HELPDESK_URL` | URL панели helpdesk (ссылки из CRM в поддержку) |
+| Переменная     | Описание                                     |
+| -------------- | -------------------------------------------- |
+| `PORT`         | Порт приложения                              |
+| `NODE_ENV`     | Режим работы: `development` или `production` |
+| `API_URL`      | URL REST API для браузера и SSR              |
+| `HELPDESK_URL` | URL панели helpdesk                          |
 
 ## Скрипты
 
-| Команда | Описание |
-|---------|----------|
-| `npm run dev` | Dev-сервер (порт 3003) |
-| `npm run build` | Production-сборка |
-| `npm run preview` | Просмотр сборки |
-| `npm run lint` | ESLint |
+| Команда           | Описание               |
+| ----------------- | ---------------------- |
+| `npm run dev`     | Dev-сервер (порт 3003) |
+| `npm run build`   | Production-сборка      |
+| `npm run preview` | Просмотр сборки        |
+| `npm run lint`    | ESLint                 |
