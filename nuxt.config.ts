@@ -1,6 +1,7 @@
 import tailwindcss from '@tailwindcss/vite'
 
 export default defineNuxtConfig({
+  ssr: true,
   compatibilityDate: '2024-11-01',
   future: {
     compatibilityVersion: 4,
@@ -28,10 +29,10 @@ export default defineNuxtConfig({
   css: ['~/assets/css/tailwind.css', '~/assets/scss/main.scss'],
 
   runtimeConfig: {
-    apiUrl: process.env.NUXT_API_URL || 'http://127.0.0.1:3001/api',
+    apiUrl: process.env.API_URL || '',
     public: {
-      apiUrl: process.env.NUXT_PUBLIC_API_URL || 'http://127.0.0.1:3001/api',
-      helpdeskUrl: process.env.NUXT_PUBLIC_HELPDESK_URL || 'http://127.0.0.1:3002',
+      apiUrl: process.env.API_URL || '',
+      helpdeskUrl: process.env.HELPDESK_URL || '',
     },
   },
 
