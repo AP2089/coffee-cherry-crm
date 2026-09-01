@@ -6,8 +6,9 @@ export default defineConfig({
   plugins: [vue()],
   test: {
     environment: 'happy-dom',
-    include: ['**/*.{test,spec}.ts'],
+    include: ['tests/**/*.{test,spec}.ts'],
     exclude: ['node_modules', '.nuxt', '.output'],
+    setupFiles: ['./vitest.setup.ts'],
   },
   resolve: {
     alias: {
