@@ -46,7 +46,9 @@
                   <p class="text-xs uppercase tracking-[0.12em] text-muted-foreground">
                     Комментарий
                   </p>
-                  <p class="mt-1 whitespace-pre-wrap text-sm">{{ orders.current.customer.comment }}</p>
+                  <p class="mt-1 whitespace-pre-wrap text-sm">
+                    {{ orders.current.customer.comment }}
+                  </p>
                 </div>
               </div>
 
@@ -71,7 +73,9 @@
 
               <div class="flex justify-between border-t border-border pt-4">
                 <span class="font-medium">Итого</span>
-                <span class="font-display text-lg">{{ formatPrice(orders.current.totalPrice) }}</span>
+                <span class="font-display text-lg">{{
+                  formatPrice(orders.current.totalPrice)
+                }}</span>
               </div>
             </CardContent>
           </Card>
@@ -113,13 +117,7 @@ const route = useRoute()
 const orders = useOrdersStore()
 const orderId = computed(() => String(route.params.id))
 
-const statusOptions: OrderStatus[] = [
-  'pending',
-  'confirmed',
-  'shipped',
-  'delivered',
-  'cancelled',
-]
+const statusOptions: OrderStatus[] = ['pending', 'confirmed', 'shipped', 'delivered', 'cancelled']
 
 function statusLabel(status: OrderStatus) {
   return orderStatusLabels[status]

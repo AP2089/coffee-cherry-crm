@@ -67,9 +67,7 @@
         <p v-if="!slug" class="text-right text-xs text-muted-foreground">
           Сначала укажите slug товара
         </p>
-        <p v-else class="text-right text-xs text-muted-foreground">
-          JPEG, PNG или WebP, до 100 МБ
-        </p>
+        <p v-else class="text-right text-xs text-muted-foreground">JPEG, PNG или WebP, до 100 МБ</p>
       </div>
     </div>
   </div>
@@ -115,9 +113,7 @@ const previewSrc = computed(() => {
 
 const showPreview = computed(() => Boolean(previewSrc.value))
 
-const busy = computed(
-  () => processing.value || products.uploadingImage || products.imageSaving,
-)
+const busy = computed(() => processing.value || products.uploadingImage || products.imageSaving)
 
 const busyLabel = computed(() => {
   if (action.value === 'remove') return 'Удаление…'
@@ -125,9 +121,7 @@ const busyLabel = computed(() => {
   return 'Загрузка…'
 })
 
-const hasPendingChanges = computed(
-  () => Boolean(pendingFile.value) || pendingRemoval.value,
-)
+const hasPendingChanges = computed(() => Boolean(pendingFile.value) || pendingRemoval.value)
 
 function clearLocalPreview() {
   if (localPreviewUrl.value) {

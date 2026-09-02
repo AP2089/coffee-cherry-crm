@@ -84,7 +84,9 @@
           <div class="space-y-3">
             <div class="flex items-center justify-between gap-3">
               <Label>Ноты вкуса</Label>
-              <Button type="button" size="sm" variant="outline" @click="addFlavorNote">Добавить</Button>
+              <Button type="button" size="sm" variant="outline" @click="addFlavorNote"
+                >Добавить</Button
+              >
             </div>
 
             <div v-for="(_, index) in form.flavorNotes" :key="index" class="flex gap-2">

@@ -1,9 +1,6 @@
 <template>
   <NuxtLayout name="app">
-    <LayoutAppHeader
-      :title="products.current?.name || 'Товар'"
-      subtitle="Редактирование товара"
-    />
+    <LayoutAppHeader :title="products.current?.name || 'Товар'" subtitle="Редактирование товара" />
 
     <div class="flex-1 overflow-y-auto p-4 md:p-6">
       <div v-if="products.loading" class="space-y-4">

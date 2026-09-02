@@ -80,10 +80,7 @@
           </div>
         </div>
 
-        <p
-          v-if="products.loadingMore"
-          class="py-3 text-center text-xs text-muted-foreground"
-        >
+        <p v-if="products.loadingMore" class="py-3 text-center text-xs text-muted-foreground">
           Загрузка…
         </p>
 

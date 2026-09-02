@@ -14,15 +14,10 @@ function isUnderfilled(element: HTMLElement) {
 }
 
 export function useCrmInfiniteScroll(options: CrmInfiniteScrollOptions) {
-  useInfiniteScroll(
-    options.listEl,
-    () => options.loadMore(),
-    {
-      distance: 80,
-      canLoadMore: () =>
-        options.hasMore() && !options.loading() && !options.loadingMore(),
-    },
-  )
+  useInfiniteScroll(options.listEl, () => options.loadMore(), {
+    distance: 80,
+    canLoadMore: () => options.hasMore() && !options.loading() && !options.loadingMore(),
+  })
 
   async function ensureFilled() {
     if (!options.hasMore() || options.loading()) return
@@ -30,12 +25,7 @@ export function useCrmInfiniteScroll(options: CrmInfiniteScrollOptions) {
     await nextTick()
 
     let guard = 0
-    while (
-      guard < 5 &&
-      options.hasMore() &&
-      !options.loading() &&
-      !options.loadingMore()
-    ) {
+    while (guard < 5 && options.hasMore() && !options.loading() && !options.loadingMore()) {
       const element = options.listEl.value
       if (!element || !isUnderfilled(element)) break
 
