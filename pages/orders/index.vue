@@ -56,10 +56,7 @@
           </div>
         </NuxtLink>
 
-        <p
-          v-if="orders.loadingMore"
-          class="py-3 text-center text-xs text-muted-foreground"
-        >
+        <p v-if="orders.loadingMore" class="py-3 text-center text-xs text-muted-foreground">
           Загрузка…
         </p>
 

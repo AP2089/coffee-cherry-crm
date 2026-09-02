@@ -1,6 +1,11 @@
 import { defineStore } from 'pinia'
 import type { ApiResponse, PaginatedList } from '~/types/api'
-import type { Coffee, CoffeeLocalizedContent, CoffeeTextFields, CreateCoffeeInput } from '~/types/crm'
+import type {
+  Coffee,
+  CoffeeLocalizedContent,
+  CoffeeTextFields,
+  CreateCoffeeInput,
+} from '~/types/crm'
 import { useApiBase } from '~/composables/useApiBase'
 import { useAuthStore } from '~/stores/auth'
 import { CRM_PAGE_SIZE } from '~/utils/pagination'
@@ -112,7 +117,10 @@ export const useProductsStore = defineStore('products', {
       }
     },
 
-    translationToFields(translation: CoffeeLocalizedContent | undefined, fallback: Coffee): CoffeeTextFields {
+    translationToFields(
+      translation: CoffeeLocalizedContent | undefined,
+      fallback: Coffee,
+    ): CoffeeTextFields {
       if (!translation) {
         return {
           name: fallback.name,

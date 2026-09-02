@@ -47,7 +47,9 @@
               <div class="min-w-0">
                 <div class="flex flex-wrap items-center gap-2">
                   <p class="font-medium">{{ item.name }}</p>
-                  <Badge :variant="statusVariant(item.status)">{{ statusLabel(item.status) }}</Badge>
+                  <Badge :variant="statusVariant(item.status)">{{
+                    statusLabel(item.status)
+                  }}</Badge>
                 </div>
                 <p class="mt-1 text-sm text-muted-foreground">{{ item.email }}</p>
                 <p class="mt-1 text-xs text-muted-foreground">{{ formatDate(item.createdAt) }}</p>
@@ -106,10 +108,7 @@
           </CardContent>
         </Card>
 
-        <p
-          v-if="contacts.loadingMore"
-          class="py-3 text-center text-xs text-muted-foreground"
-        >
+        <p v-if="contacts.loadingMore" class="py-3 text-center text-xs text-muted-foreground">
           Загрузка…
         </p>
 
