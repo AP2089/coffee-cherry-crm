@@ -4,8 +4,29 @@ import type { Coffee } from '~/types/crm'
 import { useAuthStore } from '~/stores/auth'
 import { useProductsStore } from '~/stores/products'
 
-vi.mock('~/composables/useApiBase', () => ({
-  useApiBase: () => 'http://localhost:3001/api',
+const { apiGetCoffees, apiPostCoffee, apiPatchCoffee, apiDeleteCoffee } = vi.hoisted(() => ({
+  apiGetCoffees: vi.fn(),
+  apiPostCoffee: vi.fn(),
+  apiPatchCoffee: vi.fn(),
+  apiDeleteCoffee: vi.fn(),
+}))
+
+vi.mock('~/api/coffees', () => ({
+  apiGetCoffees,
+  apiGetCoffee: vi.fn(),
+  apiPostCoffee,
+  apiPatchCoffee,
+  apiDeleteCoffee,
+  apiDeleteCoffeeImage: vi.fn(),
+}))
+
+vi.mock('~/api/uploads', () => ({
+  apiPostUpload: vi.fn(),
+}))
+
+vi.mock('~/api/auth', () => ({
+  apiPostAuthLogin: vi.fn(),
+  apiGetAuthMe: vi.fn(),
 }))
 
 const sampleCoffee: Coffee = {
@@ -30,7 +51,10 @@ const sampleCoffee: Coffee = {
 describe('products store', () => {
   beforeEach(() => {
     setActivePinia(createPinia())
-    vi.stubGlobal('$fetch', vi.fn())
+    apiGetCoffees.mockReset()
+    apiPostCoffee.mockReset()
+    apiPatchCoffee.mockReset()
+    apiDeleteCoffee.mockReset()
   })
 
   it('coffeeToFields copies coffee text fields', () => {
@@ -100,7 +124,7 @@ describe('products store', () => {
 
     await store.loadMoreProducts()
 
-    expect($fetch).not.toHaveBeenCalled()
+    expect(apiGetCoffees).not.toHaveBeenCalled()
   })
 
   it('saveProduct rejects empty flavor notes', async () => {
@@ -115,7 +139,7 @@ describe('products store', () => {
       }),
     ).rejects.toThrow('Добавьте хотя бы одну ноту вкуса')
 
-    expect($fetch).not.toHaveBeenCalled()
+    expect(apiPatchCoffee).not.toHaveBeenCalled()
   })
 
   it('createProduct normalizes slug and default image', async () => {
@@ -123,7 +147,7 @@ describe('products store', () => {
     const auth = useAuthStore()
     auth.token = 'jwt-token'
 
-    vi.mocked($fetch).mockResolvedValue({
+    apiPostCoffee.mockResolvedValue({
       success: true,
       data: sampleCoffee,
     })
@@ -145,16 +169,15 @@ describe('products store', () => {
       image: '',
     })
 
-    expect($fetch).toHaveBeenCalledWith(
-      'http://localhost:3001/api/coffees',
+    expect(apiPostCoffee).toHaveBeenCalledWith(
       expect.objectContaining({
-        method: 'POST',
-        body: expect.objectContaining({
-          slug: 'new-slug',
-          image: '/images/new-slug.jpg',
-          gallery: ['/images/new-slug.jpg'],
-          flavorNotes: ['citrus'],
-        }),
+        slug: 'new-slug',
+        image: '/images/new-slug.jpg',
+        gallery: ['/images/new-slug.jpg'],
+        flavorNotes: ['citrus'],
+      }),
+      expect.objectContaining({
+        headers: { Authorization: 'Bearer jwt-token' },
       }),
     )
   })
@@ -167,7 +190,7 @@ describe('products store', () => {
     store.current = sampleCoffee
     store.total = 1
 
-    vi.mocked($fetch).mockResolvedValue({ success: true })
+    apiDeleteCoffee.mockResolvedValue({ success: true })
 
     await store.deleteProduct(sampleCoffee.slug)
 

@@ -4,8 +4,20 @@ import type { ContactMessage } from '~/types/crm'
 import { useAuthStore } from '~/stores/auth'
 import { useContactsStore } from '~/stores/contacts'
 
-vi.mock('~/composables/useApiBase', () => ({
-  useApiBase: () => 'http://localhost:3001/api',
+const { apiGetContacts, apiPatchContact } = vi.hoisted(() => ({
+  apiGetContacts: vi.fn(),
+  apiPatchContact: vi.fn(),
+}))
+
+vi.mock('~/api/contacts', () => ({
+  apiGetContacts,
+  apiPatchContact,
+  apiDeleteContact: vi.fn(),
+}))
+
+vi.mock('~/api/auth', () => ({
+  apiPostAuthLogin: vi.fn(),
+  apiGetAuthMe: vi.fn(),
 }))
 
 const sampleContact: ContactMessage = {
@@ -21,7 +33,8 @@ const sampleContact: ContactMessage = {
 describe('contacts store', () => {
   beforeEach(() => {
     setActivePinia(createPinia())
-    vi.stubGlobal('$fetch', vi.fn())
+    apiGetContacts.mockReset()
+    apiPatchContact.mockReset()
   })
 
   it('setStatusFilter updates filter value', () => {
@@ -39,7 +52,7 @@ describe('contacts store', () => {
 
     await store.loadMoreContacts()
 
-    expect($fetch).not.toHaveBeenCalled()
+    expect(apiGetContacts).not.toHaveBeenCalled()
   })
 
   it('updateStatus removes item when it no longer matches filter', async () => {
@@ -50,7 +63,7 @@ describe('contacts store', () => {
     store.total = 1
     store.statusFilter = 'new'
 
-    vi.mocked($fetch).mockResolvedValue({
+    apiPatchContact.mockResolvedValue({
       success: true,
       data: { ...sampleContact, status: 'archived' },
     })

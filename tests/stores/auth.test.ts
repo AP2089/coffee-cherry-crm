@@ -8,6 +8,11 @@ const { saveAuthToken, clearAuthToken } = vi.hoisted(() => ({
   clearAuthToken: vi.fn(),
 }))
 
+const { apiPostAuthLogin, apiGetAuthMe } = vi.hoisted(() => ({
+  apiPostAuthLogin: vi.fn(),
+  apiGetAuthMe: vi.fn(),
+}))
+
 vi.mock('~/composables/useApiBase', () => ({
   useApiBase: () => 'http://localhost:3001/api',
   getAuthToken: vi.fn(() => null),
@@ -15,10 +20,16 @@ vi.mock('~/composables/useApiBase', () => ({
   clearAuthToken,
 }))
 
+vi.mock('~/api/auth', () => ({
+  apiPostAuthLogin,
+  apiGetAuthMe,
+}))
+
 describe('auth store', () => {
   beforeEach(() => {
     setActivePinia(createPinia())
-    vi.stubGlobal('$fetch', vi.fn())
+    apiPostAuthLogin.mockReset()
+    apiGetAuthMe.mockReset()
     saveAuthToken.mockClear()
     clearAuthToken.mockClear()
   })
@@ -53,7 +64,7 @@ describe('auth store', () => {
     const store = useAuthStore()
     const user = { username: 'admin', role: UserRole.Admin }
 
-    vi.mocked($fetch).mockResolvedValue({
+    apiPostAuthLogin.mockResolvedValue({
       success: true,
       data: { token: 'jwt-token', user },
     })
@@ -69,7 +80,7 @@ describe('auth store', () => {
   it('login sets localized error on 401', async () => {
     const store = useAuthStore()
 
-    vi.mocked($fetch).mockRejectedValue({
+    apiPostAuthLogin.mockRejectedValue({
       statusCode: 401,
       message: 'Unauthorized',
     })
@@ -86,7 +97,7 @@ describe('auth store', () => {
     const store = useAuthStore()
     store.token = 'jwt-token'
 
-    vi.mocked($fetch).mockResolvedValueOnce({
+    apiGetAuthMe.mockResolvedValueOnce({
       success: true,
       data: { username: 'admin', role: UserRole.Admin },
     })
@@ -95,7 +106,7 @@ describe('auth store', () => {
 
     expect(store.user?.username).toBe('admin')
 
-    vi.mocked($fetch).mockRejectedValueOnce(new Error('Unauthorized'))
+    apiGetAuthMe.mockRejectedValueOnce(new Error('Unauthorized'))
 
     await store.fetchMe()
 

@@ -4,8 +4,20 @@ import type { Order } from '~/types/crm'
 import { useAuthStore } from '~/stores/auth'
 import { useOrdersStore } from '~/stores/orders'
 
-vi.mock('~/composables/useApiBase', () => ({
-  useApiBase: () => 'http://localhost:3001/api',
+const { apiGetOrders, apiPatchOrder } = vi.hoisted(() => ({
+  apiGetOrders: vi.fn(),
+  apiPatchOrder: vi.fn(),
+}))
+
+vi.mock('~/api/orders', () => ({
+  apiGetOrders,
+  apiGetOrder: vi.fn(),
+  apiPatchOrder,
+}))
+
+vi.mock('~/api/auth', () => ({
+  apiPostAuthLogin: vi.fn(),
+  apiGetAuthMe: vi.fn(),
 }))
 
 const sampleOrder: Order = {
@@ -36,7 +48,8 @@ const sampleOrder: Order = {
 describe('orders store', () => {
   beforeEach(() => {
     setActivePinia(createPinia())
-    vi.stubGlobal('$fetch', vi.fn())
+    apiGetOrders.mockReset()
+    apiPatchOrder.mockReset()
   })
 
   it('setStatusFilter updates filter value', () => {
@@ -53,7 +66,7 @@ describe('orders store', () => {
 
     await store.loadMoreOrders()
 
-    expect($fetch).not.toHaveBeenCalled()
+    expect(apiGetOrders).not.toHaveBeenCalled()
   })
 
   it('updateStatus updates current order and list item', async () => {
@@ -65,7 +78,7 @@ describe('orders store', () => {
 
     const updatedOrder = { ...sampleOrder, status: 'confirmed' as const }
 
-    vi.mocked($fetch).mockResolvedValue({
+    apiPatchOrder.mockResolvedValue({
       success: true,
       data: updatedOrder,
     })
@@ -84,7 +97,7 @@ describe('orders store', () => {
     store.total = 1
     store.statusFilter = 'pending'
 
-    vi.mocked($fetch).mockResolvedValue({
+    apiPatchOrder.mockResolvedValue({
       success: true,
       data: { ...sampleOrder, status: 'confirmed' },
     })
