@@ -1,3 +1,7 @@
+import type { NitroFetchOptions, NitroFetchRequest } from 'nitropack'
+
+export type FetchOptions = NitroFetchOptions<NitroFetchRequest>
+
 export interface ApiResponse<T> {
   success: boolean
   data?: T

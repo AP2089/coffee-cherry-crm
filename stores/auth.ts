@@ -1,7 +1,7 @@
 import { defineStore } from 'pinia'
-import type { ApiResponse } from '~/types/api'
 import type { AuthUser } from '~/types/auth'
-import { clearAuthToken, getAuthToken, saveAuthToken, useApiBase } from '~/composables/useApiBase'
+import { apiGetAuthMe, apiPostAuthLogin } from '~/api/auth'
+import { clearAuthToken, getAuthToken, saveAuthToken } from '~/composables/useApiBase'
 
 export const useAuthStore = defineStore('auth', {
   state: () => ({
@@ -28,13 +28,7 @@ export const useAuthStore = defineStore('auth', {
       this.error = null
 
       try {
-        const response = await $fetch<ApiResponse<{ token: string; user: AuthUser }>>(
-          `${useApiBase()}/auth/login`,
-          {
-            method: 'POST',
-            body: { username, password },
-          },
-        )
+        const response = await apiPostAuthLogin({ username, password })
 
         if (!response.success || !response.data) {
           throw new Error(response.message || 'Login failed')
@@ -73,7 +67,7 @@ export const useAuthStore = defineStore('auth', {
       if (!this.token) return
 
       try {
-        const response = await $fetch<ApiResponse<AuthUser>>(`${useApiBase()}/auth/me`, {
+        const response = await apiGetAuthMe({
           headers: {
             Authorization: `Bearer ${this.token}`,
           },

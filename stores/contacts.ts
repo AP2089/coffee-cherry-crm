@@ -1,7 +1,6 @@
 import { defineStore } from 'pinia'
-import type { ApiResponse, PaginatedList } from '~/types/api'
 import type { ContactMessage, ContactMessageStatus } from '~/types/crm'
-import { useApiBase } from '~/composables/useApiBase'
+import { apiDeleteContact, apiGetContacts, apiPatchContact } from '~/api/contacts'
 import { useAuthStore } from '~/stores/auth'
 import { CRM_PAGE_SIZE } from '~/utils/pagination'
 
@@ -36,17 +35,12 @@ export const useContactsStore = defineStore('contacts', {
       this.error = null
 
       try {
-        const params = new URLSearchParams({
-          limit: String(CRM_PAGE_SIZE),
-          offset: append ? String(this.items.length) : '0',
-        })
-
-        if (this.statusFilter !== 'all') {
-          params.set('status', this.statusFilter)
-        }
-
-        const response = await $fetch<ApiResponse<PaginatedList<ContactMessage>>>(
-          `${useApiBase()}/contacts?${params.toString()}`,
+        const response = await apiGetContacts(
+          {
+            limit: CRM_PAGE_SIZE,
+            offset: append ? this.items.length : 0,
+            ...(this.statusFilter !== 'all' ? { status: this.statusFilter } : {}),
+          },
           { headers: this.authHeaders() },
         )
 
@@ -81,14 +75,7 @@ export const useContactsStore = defineStore('contacts', {
       this.actionLoading = id
 
       try {
-        const response = await $fetch<ApiResponse<ContactMessage>>(
-          `${useApiBase()}/contacts/${id}`,
-          {
-            method: 'PATCH',
-            headers: this.authHeaders(),
-            body: { status },
-          },
-        )
+        const response = await apiPatchContact(id, { status }, { headers: this.authHeaders() })
 
         if (!response.success || !response.data) {
           throw new Error(response.message || 'Не удалось обновить статус')
@@ -114,8 +101,7 @@ export const useContactsStore = defineStore('contacts', {
       this.actionLoading = id
 
       try {
-        const response = await $fetch<ApiResponse<unknown>>(`${useApiBase()}/contacts/${id}`, {
-          method: 'DELETE',
+        const response = await apiDeleteContact(id, {
           headers: this.authHeaders(),
         })
 

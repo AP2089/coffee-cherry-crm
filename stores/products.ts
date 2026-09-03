@@ -1,12 +1,19 @@
 import { defineStore } from 'pinia'
-import type { ApiResponse, PaginatedList } from '~/types/api'
 import type {
   Coffee,
   CoffeeLocalizedContent,
   CoffeeTextFields,
   CreateCoffeeInput,
 } from '~/types/crm'
-import { useApiBase } from '~/composables/useApiBase'
+import {
+  apiDeleteCoffee,
+  apiDeleteCoffeeImage,
+  apiGetCoffee,
+  apiGetCoffees,
+  apiPatchCoffee,
+  apiPostCoffee,
+} from '~/api/coffees'
+import { apiPostUpload } from '~/api/uploads'
 import { useAuthStore } from '~/stores/auth'
 import { CRM_PAGE_SIZE } from '~/utils/pagination'
 
@@ -44,13 +51,11 @@ export const useProductsStore = defineStore('products', {
       this.error = null
 
       try {
-        const params = new URLSearchParams({
-          limit: String(CRM_PAGE_SIZE),
-          offset: append ? String(this.items.length) : '0',
-        })
-
-        const response = await $fetch<ApiResponse<PaginatedList<Coffee>>>(
-          `${useApiBase()}/coffees?${params.toString()}`,
+        const response = await apiGetCoffees(
+          {
+            limit: CRM_PAGE_SIZE,
+            offset: append ? this.items.length : 0,
+          },
           { headers: this.authHeaders() },
         )
 
@@ -86,7 +91,7 @@ export const useProductsStore = defineStore('products', {
       this.error = null
 
       try {
-        const response = await $fetch<ApiResponse<Coffee>>(`${useApiBase()}/coffees/${slug}`, {
+        const response = await apiGetCoffee(slug, {
           headers: this.authHeaders(),
         })
 
@@ -161,10 +166,8 @@ export const useProductsStore = defineStore('products', {
         formData.append('kind', options.kind)
         formData.append('file', file)
 
-        const response = await $fetch<ApiResponse<{ url: string }>>(`${useApiBase()}/uploads`, {
-          method: 'POST',
+        const response = await apiPostUpload(formData, {
           headers: this.authHeaders(),
-          body: formData,
         })
 
         if (!response.success || !response.data?.url) {
@@ -192,14 +195,14 @@ export const useProductsStore = defineStore('products', {
       }
 
       try {
-        const response = await $fetch<ApiResponse<Coffee>>(`${useApiBase()}/coffees/${slug}`, {
-          method: 'PATCH',
-          headers: this.authHeaders(),
-          body: {
+        const response = await apiPatchCoffee(
+          slug,
+          {
             image,
             gallery: [image],
           },
-        })
+          { headers: this.authHeaders() },
+        )
 
         if (!response.success || !response.data) {
           throw new Error(response.message || 'Не удалось сохранить изображение')
@@ -227,13 +230,9 @@ export const useProductsStore = defineStore('products', {
       this.error = null
 
       try {
-        const response = await $fetch<ApiResponse<Coffee>>(
-          `${useApiBase()}/coffees/${slug}/image`,
-          {
-            method: 'DELETE',
-            headers: this.authHeaders(),
-          },
-        )
+        const response = await apiDeleteCoffeeImage(slug, {
+          headers: this.authHeaders(),
+        })
 
         if (!response.success || !response.data) {
           throw new Error(response.message || 'Не удалось удалить изображение')
@@ -290,10 +289,8 @@ export const useProductsStore = defineStore('products', {
                 },
               }
 
-        const response = await $fetch<ApiResponse<Coffee>>(`${useApiBase()}/coffees/${slug}`, {
-          method: 'PATCH',
+        const response = await apiPatchCoffee(slug, body, {
           headers: this.authHeaders(),
-          body,
         })
 
         if (!response.success || !response.data) {
@@ -330,17 +327,16 @@ export const useProductsStore = defineStore('products', {
         const image = input.image.trim() || `/images/${slug}.jpg`
         const gallery = input.gallery?.length ? input.gallery : [image]
 
-        const response = await $fetch<ApiResponse<Coffee>>(`${useApiBase()}/coffees`, {
-          method: 'POST',
-          headers: this.authHeaders(),
-          body: {
+        const response = await apiPostCoffee(
+          {
             ...input,
             slug,
             flavorNotes,
             image,
             gallery,
           },
-        })
+          { headers: this.authHeaders() },
+        )
 
         if (!response.success || !response.data) {
           throw new Error(response.message || 'Не удалось создать товар')
@@ -363,8 +359,7 @@ export const useProductsStore = defineStore('products', {
       this.error = null
 
       try {
-        const response = await $fetch<ApiResponse<unknown>>(`${useApiBase()}/coffees/${slug}`, {
-          method: 'DELETE',
+        const response = await apiDeleteCoffee(slug, {
           headers: this.authHeaders(),
         })
 

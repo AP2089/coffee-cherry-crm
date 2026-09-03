@@ -1,7 +1,6 @@
 import { defineStore } from 'pinia'
-import type { ApiResponse, PaginatedList } from '~/types/api'
 import type { Order, OrderStatus } from '~/types/crm'
-import { useApiBase } from '~/composables/useApiBase'
+import { apiGetOrder, apiGetOrders, apiPatchOrder } from '~/api/orders'
 import { useAuthStore } from '~/stores/auth'
 import { CRM_PAGE_SIZE } from '~/utils/pagination'
 
@@ -38,17 +37,12 @@ export const useOrdersStore = defineStore('orders', {
       this.error = null
 
       try {
-        const params = new URLSearchParams({
-          limit: String(CRM_PAGE_SIZE),
-          offset: append ? String(this.items.length) : '0',
-        })
-
-        if (this.statusFilter !== 'all') {
-          params.set('status', this.statusFilter)
-        }
-
-        const response = await $fetch<ApiResponse<PaginatedList<Order>>>(
-          `${useApiBase()}/orders?${params.toString()}`,
+        const response = await apiGetOrders(
+          {
+            limit: CRM_PAGE_SIZE,
+            offset: append ? this.items.length : 0,
+            ...(this.statusFilter !== 'all' ? { status: this.statusFilter } : {}),
+          },
           { headers: this.authHeaders() },
         )
 
@@ -84,7 +78,7 @@ export const useOrdersStore = defineStore('orders', {
       this.error = null
 
       try {
-        const response = await $fetch<ApiResponse<Order>>(`${useApiBase()}/orders/${id}`, {
+        const response = await apiGetOrder(id, {
           headers: this.authHeaders(),
         })
 
@@ -105,11 +99,7 @@ export const useOrdersStore = defineStore('orders', {
       this.saving = true
 
       try {
-        const response = await $fetch<ApiResponse<Order>>(`${useApiBase()}/orders/${id}`, {
-          method: 'PATCH',
-          headers: this.authHeaders(),
-          body: { status },
-        })
+        const response = await apiPatchOrder(id, { status }, { headers: this.authHeaders() })
 
         if (!response.success || !response.data) {
           throw new Error(response.message || 'Не удалось обновить статус')
