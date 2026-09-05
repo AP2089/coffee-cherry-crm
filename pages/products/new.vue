@@ -133,6 +133,7 @@ definePageMeta({
 })
 
 const products = useProductsStore()
+const { assertCanEdit } = useCanEdit()
 const weightOptions = [250, 500, 1000] as const
 const imagesEditorRef = ref<{
   commit: (options?: { mode?: 'create' | 'edit' }) => Promise<string>
@@ -174,6 +175,8 @@ function removeFlavorNote(index: number) {
 }
 
 async function createProduct() {
+  if (!assertCanEdit()) return
+
   const slug = form.value.slug.trim().toLowerCase()
 
   try {

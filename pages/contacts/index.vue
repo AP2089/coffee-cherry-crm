@@ -61,7 +61,7 @@
                   size="sm"
                   variant="outline"
                   :disabled="contacts.actionLoading === item._id"
-                  @click="contacts.updateStatus(item._id, 'read')"
+                  @click="onUpdateStatus(item._id, 'read')"
                 >
                   Прочитано
                 </Button>
@@ -70,11 +70,14 @@
                   size="sm"
                   variant="outline"
                   :disabled="contacts.actionLoading === item._id"
-                  @click="contacts.updateStatus(item._id, 'archived')"
+                  @click="onUpdateStatus(item._id, 'archived')"
                 >
                   В архив
                 </Button>
-                <AlertDialog>
+                <Button v-if="!canEdit" size="sm" variant="destructive" @click="assertCanEdit()">
+                  Удалить
+                </Button>
+                <AlertDialog v-else>
                   <AlertDialogTrigger as-child>
                     <Button
                       size="sm"
@@ -93,7 +96,7 @@
                     </AlertDialogHeader>
                     <AlertDialogFooter>
                       <AlertDialogCancel>Отмена</AlertDialogCancel>
-                      <AlertDialogAction @click="contacts.deleteContact(item._id)">
+                      <AlertDialogAction @click="onDeleteContact(item._id)">
                         Удалить
                       </AlertDialogAction>
                     </AlertDialogFooter>
@@ -134,6 +137,7 @@ definePageMeta({
 
 const contacts = useContactsStore()
 const listEl = ref<HTMLElement | null>(null)
+const { canEdit, assertCanEdit } = useCanEdit()
 
 const statusFilters = [
   { value: 'all' as const, label: 'Все' },
@@ -164,6 +168,16 @@ function statusVariant(status: ContactMessageStatus) {
 async function setFilter(value: ContactMessageStatus | 'all') {
   contacts.setStatusFilter(value)
   await contacts.fetchContacts()
+}
+
+function onUpdateStatus(id: string, status: ContactMessageStatus) {
+  if (!assertCanEdit()) return
+  void contacts.updateStatus(id, status)
+}
+
+function onDeleteContact(id: string) {
+  if (!assertCanEdit()) return
+  void contacts.deleteContact(id)
 }
 
 onMounted(async () => {

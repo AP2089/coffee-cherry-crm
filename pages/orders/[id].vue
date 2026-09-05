@@ -115,6 +115,7 @@ definePageMeta({
 
 const route = useRoute()
 const orders = useOrdersStore()
+const { assertCanEdit } = useCanEdit()
 const orderId = computed(() => String(route.params.id))
 
 const statusOptions: OrderStatus[] = ['pending', 'confirmed', 'shipped', 'delivered', 'cancelled']
@@ -125,6 +126,7 @@ function statusLabel(status: OrderStatus) {
 
 async function updateStatus(status: OrderStatus) {
   if (!orders.current || orders.current.status === status) return
+  if (!assertCanEdit()) return
   await orders.updateStatus(orderId.value, status)
 }
 

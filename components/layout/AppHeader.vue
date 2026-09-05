@@ -29,6 +29,7 @@ const auth = useAuthStore()
 
 const roleLabel = computed(() => {
   if (auth.user?.role === UserRole.Admin) return 'Администратор'
+  if (auth.isGuest) return 'Гость'
   return 'Оператор'
 })
 

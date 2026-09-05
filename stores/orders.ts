@@ -1,6 +1,7 @@
 import { defineStore } from 'pinia'
 import type { Order, OrderStatus } from '~/types/crm'
 import { apiGetOrder, apiGetOrders, apiPatchOrder } from '~/api/orders'
+import { assertGuestCanEdit } from '~/composables/useCanEdit'
 import { useAuthStore } from '~/stores/auth'
 import { CRM_PAGE_SIZE } from '~/utils/pagination'
 
@@ -96,6 +97,8 @@ export const useOrdersStore = defineStore('orders', {
     },
 
     async updateStatus(id: string, status: OrderStatus) {
+      if (!assertGuestCanEdit()) return
+
       this.saving = true
 
       try {

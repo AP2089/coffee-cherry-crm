@@ -4,9 +4,7 @@
 
     <div ref="listEl" class="flex-1 overflow-y-auto p-4 md:p-6">
       <div class="mb-4 flex justify-end">
-        <Button variant="magnetic-filled" @click="navigateTo('/products/new')">
-          Добавить товар
-        </Button>
+        <Button variant="magnetic-filled" @click="onAddProduct"> Добавить товар </Button>
       </div>
 
       <p
@@ -25,7 +23,7 @@
         class="rounded-sm border border-dashed border-border px-6 py-16 text-center"
       >
         <p class="font-display text-lg">Товаров нет</p>
-        <Button class="mt-4" variant="outline" @click="navigateTo('/products/new')">
+        <Button class="mt-4" variant="outline" @click="onAddProduct">
           Добавить первый товар
         </Button>
       </div>
@@ -50,7 +48,10 @@
                 <p class="mt-1 text-xs text-muted-foreground">остаток: {{ item.stock }}</p>
               </div>
 
-              <AlertDialog>
+              <Button v-if="!canEdit" size="sm" variant="destructive" @click.stop="assertCanEdit()">
+                Удалить
+              </Button>
+              <AlertDialog v-else>
                 <AlertDialogTrigger as-child>
                   <Button
                     size="sm"
@@ -105,6 +106,7 @@ definePageMeta({
 
 const products = useProductsStore()
 const listEl = ref<HTMLElement | null>(null)
+const { canEdit, assertCanEdit } = useCanEdit()
 
 useCrmInfiniteScroll({
   listEl,
@@ -115,7 +117,14 @@ useCrmInfiniteScroll({
   itemsLength: () => products.items.length,
 })
 
+function onAddProduct() {
+  if (!assertCanEdit()) return
+  void navigateTo('/products/new')
+}
+
 async function removeProduct(slug: string) {
+  if (!assertCanEdit()) return
+
   try {
     await products.deleteProduct(slug)
   } catch {

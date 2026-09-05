@@ -36,7 +36,16 @@
           </div>
 
           <div class="flex items-center gap-2">
-            <AlertDialog>
+            <Button
+              v-if="!canEdit"
+              size="sm"
+              variant="destructive"
+              class="h-[36px] min-h-[36px] box-border py-0"
+              @click="assertCanEdit()"
+            >
+              Удалить
+            </Button>
+            <AlertDialog v-else>
               <AlertDialogTrigger as-child>
                 <Button
                   size="sm"
@@ -161,6 +170,7 @@ definePageMeta({
 
 const route = useRoute()
 const products = useProductsStore()
+const { canEdit, assertCanEdit } = useCanEdit()
 const slug = computed(() => String(route.params.slug))
 const activeLocale = ref<'ru' | 'en'>('ru')
 const image = ref('')
@@ -208,6 +218,8 @@ function removeFlavorNote(index: number) {
 }
 
 async function saveProduct() {
+  if (!assertCanEdit()) return
+
   try {
     await products.saveProduct(slug.value, activeLocale.value, form.value)
     await imagesEditorRef.value?.commit()
@@ -226,6 +238,8 @@ const saveLabel = computed(() => {
 })
 
 async function removeProduct() {
+  if (!assertCanEdit()) return
+
   try {
     await products.deleteProduct(slug.value)
     await navigateTo('/products')

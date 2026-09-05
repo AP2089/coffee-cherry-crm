@@ -1,6 +1,7 @@
 import { defineStore } from 'pinia'
 import type { ContactMessage, ContactMessageStatus } from '~/types/crm'
 import { apiDeleteContact, apiGetContacts, apiPatchContact } from '~/api/contacts'
+import { assertGuestCanEdit } from '~/composables/useCanEdit'
 import { useAuthStore } from '~/stores/auth'
 import { CRM_PAGE_SIZE } from '~/utils/pagination'
 
@@ -72,6 +73,8 @@ export const useContactsStore = defineStore('contacts', {
     },
 
     async updateStatus(id: string, status: ContactMessageStatus) {
+      if (!assertGuestCanEdit()) return
+
       this.actionLoading = id
 
       try {
@@ -98,6 +101,8 @@ export const useContactsStore = defineStore('contacts', {
     },
 
     async deleteContact(id: string) {
+      if (!assertGuestCanEdit()) return
+
       this.actionLoading = id
 
       try {
