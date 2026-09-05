@@ -1,18 +1,10 @@
-name: Deploy
+name: Deploy Production
 
 on:
   workflow_dispatch:
-    inputs:
-      environment:
-        description: Target environment
-        required: true
-        type: choice
-        options:
-          - development
-          - production
 
 concurrency:
-  group: cicd-${{ github.workflow }}-${{ github.ref }}-${{ inputs.environment }}
+  group: deploy-production-${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
@@ -38,7 +30,7 @@ jobs:
     name: CD
     needs: ci
     runs-on: ubuntu-latest
-    environment: ${{ inputs.environment }}
+    environment: production
     steps:
       - uses: actions/checkout@v5
 
@@ -50,7 +42,7 @@ jobs:
           password: ${{ secrets.VPS_PASSWORD }}
           port: 22
           source: '.'
-          target: /opt/coffee-cherry/${{ inputs.environment }}/crm
+          target: /opt/coffee-cherry/production/crm
           overwrite: true
 
       - name: Deploy crm to VPS
@@ -63,6 +55,6 @@ jobs:
           command_timeout: 30m
           script: |
             set -e
-            cd /opt/coffee-cherry/${{ inputs.environment }}
+            cd /opt/coffee-cherry/production
             docker compose up -d --build crm
             docker compose ps crm
