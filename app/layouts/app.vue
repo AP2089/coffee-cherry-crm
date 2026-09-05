@@ -7,8 +7,6 @@
     <div class="flex min-w-0 flex-1 flex-col overflow-hidden">
       <slot />
     </div>
-
-    <Toaster />
   </div>
 </template>
 

@@ -14,6 +14,7 @@ import {
   apiPostCoffee,
 } from '~/api/coffees'
 import { apiPostUpload } from '~/api/uploads'
+import { assertGuestCanEdit, GUEST_EDIT_DENIED_MESSAGE } from '~/composables/useCanEdit'
 import { useAuthStore } from '~/stores/auth'
 import { CRM_PAGE_SIZE } from '~/utils/pagination'
 
@@ -157,6 +158,10 @@ export const useProductsStore = defineStore('products', {
       file: File,
       options: { slug: string; kind: 'main' | 'gallery' },
     ): Promise<string> {
+      if (!assertGuestCanEdit()) {
+        throw new Error(GUEST_EDIT_DENIED_MESSAGE)
+      }
+
       this.uploadingImage = true
       this.error = null
 
@@ -184,6 +189,10 @@ export const useProductsStore = defineStore('products', {
     },
 
     async saveProductImage(slug: string, imagePath: string, options?: { silent?: boolean }) {
+      if (!assertGuestCanEdit()) {
+        throw new Error(GUEST_EDIT_DENIED_MESSAGE)
+      }
+
       this.imageSaving = true
       this.error = null
 
@@ -226,6 +235,10 @@ export const useProductsStore = defineStore('products', {
     },
 
     async removeProductImage(slug: string, options?: { silent?: boolean }) {
+      if (!assertGuestCanEdit()) {
+        throw new Error(GUEST_EDIT_DENIED_MESSAGE)
+      }
+
       this.imageSaving = true
       this.error = null
 
@@ -258,6 +271,10 @@ export const useProductsStore = defineStore('products', {
     },
 
     async saveProduct(slug: string, locale: 'ru' | 'en', fields: CoffeeTextFields) {
+      if (!assertGuestCanEdit()) {
+        throw new Error(GUEST_EDIT_DENIED_MESSAGE)
+      }
+
       this.saving = true
       this.error = null
 
@@ -313,6 +330,10 @@ export const useProductsStore = defineStore('products', {
     },
 
     async createProduct(input: CreateCoffeeInput) {
+      if (!assertGuestCanEdit()) {
+        throw new Error(GUEST_EDIT_DENIED_MESSAGE)
+      }
+
       this.saving = true
       this.error = null
 
@@ -355,6 +376,10 @@ export const useProductsStore = defineStore('products', {
     },
 
     async deleteProduct(slug: string) {
+      if (!assertGuestCanEdit()) {
+        throw new Error(GUEST_EDIT_DENIED_MESSAGE)
+      }
+
       this.deleting = slug
       this.error = null
 

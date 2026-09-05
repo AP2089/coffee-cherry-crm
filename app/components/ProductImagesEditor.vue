@@ -49,7 +49,7 @@
             type="button"
             variant="magnetic-filled"
             :disabled="busy || !slug"
-            @click="inputRef?.click()"
+            @click="onUploadClick"
           >
             {{ hasImage ? 'Заменить картинку' : 'Загрузить картинку' }}
           </Button>
@@ -58,7 +58,7 @@
             type="button"
             variant="outline"
             :disabled="busy"
-            @click="onRemove"
+            @click="onRemoveClick"
           >
             Удалить
           </Button>
@@ -88,6 +88,7 @@ const emit = defineEmits<{
 
 const products = useProductsStore()
 const { resolveImageUrl } = useProductImageUrl()
+const { assertCanEdit } = useCanEdit()
 
 const inputRef = ref<HTMLInputElement | null>(null)
 const processing = ref(false)
@@ -136,6 +137,11 @@ function clearPending() {
   clearLocalPreview()
 }
 
+function onUploadClick() {
+  if (!assertCanEdit()) return
+  inputRef.value?.click()
+}
+
 function onSelected(event: Event) {
   const input = event.target as HTMLInputElement
   const file = input.files?.[0]
@@ -156,6 +162,11 @@ function onRemove() {
   pendingFile.value = null
   pendingRemoval.value = Boolean(props.image)
   imageError.value = false
+}
+
+function onRemoveClick() {
+  if (!assertCanEdit()) return
+  onRemove()
 }
 
 async function commit(options?: { mode?: 'create' | 'edit' }) {
